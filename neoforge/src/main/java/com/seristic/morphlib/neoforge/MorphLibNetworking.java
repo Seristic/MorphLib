@@ -2,6 +2,7 @@ package com.seristic.morphlib.neoforge;
 
 import com.seristic.morphlib.MorphData;
 import com.seristic.morphlib.MorphManager;
+import com.seristic.logging.ModLogger;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -73,7 +74,7 @@ public class MorphLibNetworking {
      */
     public static void register(PayloadRegistrar registrar) {
         registrar.playToClient(MorphSyncPayload.TYPE, MorphSyncPayload.CODEC, MorphLibNetworking::handleMorphSync);
-        com.seristic.morphlib.Morphlib.LOGGER.info("Registered networking packets");
+        ModLogger.info("MorphLibNetworking", "Registered networking packets");
     }
 
     /**
@@ -88,12 +89,12 @@ public class MorphLibNetworking {
                 if (entity != null) {
                     if (payload.getMorphData() != null) {
                         MorphManager.applyMorph(entity, payload.getMorphData());
-                        com.seristic.morphlib.Morphlib.LOGGER.debug("Applied morph to entity: {}",
-                                entity.getName().getString());
+                        ModLogger.debug("MorphLibNetworking",
+                                "Applied morph to entity: " + entity.getName().getString());
                     } else {
                         MorphManager.removeMorph(entity);
-                        com.seristic.morphlib.Morphlib.LOGGER.debug("Removed morph from entity: {}",
-                                entity.getName().getString());
+                        ModLogger.debug("MorphLibNetworking",
+                                "Removed morph from entity: " + entity.getName().getString());
                     }
                 }
             }

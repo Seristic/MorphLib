@@ -2,6 +2,7 @@ package com.seristic.morphlib.neoforge;
 
 import com.seristic.morphlib.Morphlib;
 import com.seristic.morphlib.neoforge.client.MorphRenderHandler;
+import com.seristic.logging.ModLogger;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
@@ -25,13 +26,13 @@ public class MorphlibNeoForge {
         // Register client-side rendering on client setup
         modEventBus.addListener(this::clientSetup);
 
-        Morphlib.LOGGER.info("NeoForge mod initialized");
+        ModLogger.info("MorphlibNeoForge", "NeoForge mod initialized");
     }
 
     private void clientSetup(FMLClientSetupEvent event) {
         // Register morph rendering handler
         MorphRenderHandler.register();
-        Morphlib.LOGGER.info("Client setup completed");
+        ModLogger.info("MorphlibNeoForge", "Client setup completed");
     }
 
     private void registerNetworking(RegisterPayloadHandlersEvent event) {
@@ -40,6 +41,6 @@ public class MorphlibNeoForge {
                 .optional();
 
         MorphLibNetworking.register(registrar);
-        Morphlib.LOGGER.info("Networking registered");
+        ModLogger.info("MorphlibNeoForge", "Networking registered");
     }
 }

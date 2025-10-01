@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.seristic.morphlib.Morphlib;
 import com.seristic.morphlib.MorphData;
 import com.seristic.morphlib.MorphManager;
+import com.seristic.logging.ModLogger;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
@@ -43,7 +44,8 @@ public final class MorphRenderHandler {
                     java.lang.reflect.Method getPlayerMethod = event.getClass().getMethod("getPlayer");
                     player = (Player) getPlayerMethod.invoke(event);
                 } catch (Exception e3) {
-                    Morphlib.LOGGER.error("Could not access player from RenderPlayerEvent.Pre", e3);
+                    ModLogger.error("MorphRenderHandler",
+                            "Could not access player from RenderPlayerEvent.Pre: " + e3.getMessage());
                     return;
                 }
             }
@@ -77,7 +79,7 @@ public final class MorphRenderHandler {
             // Create morph entity for rendering
             LivingEntity morphEntity = (LivingEntity) morphType.create(mc.level, EntitySpawnReason.SPAWNER);
             if (morphEntity == null) {
-                Morphlib.LOGGER.error("Failed to create morph entity for type: {}", morphType);
+                ModLogger.error("MorphRenderHandler", "Failed to create morph entity for type: " + morphType);
                 return;
             }
 
@@ -105,10 +107,11 @@ public final class MorphRenderHandler {
             dispatcher.render(morphEntity, 0.0, 0.0, 0.0, 0.0f,
                     poseStack, bufferSource, packedLight);
 
-            Morphlib.LOGGER.debug("Successfully rendered morph for player: {}", player.getName().getString());
+            ModLogger.debug("MorphRenderHandler",
+                    "Successfully rendered morph for player: " + player.getName().getString());
         } catch (Exception e) {
-            Morphlib.LOGGER.error("Error rendering morph for player {}: {}", player.getName().getString(),
-                    e.getMessage(), e);
+            ModLogger.error("MorphRenderHandler",
+                    "Error rendering morph for player " + player.getName().getString() + ": " + e.getMessage());
             // Don't cancel event if there's an error - let normal rendering proceed
         }
     }

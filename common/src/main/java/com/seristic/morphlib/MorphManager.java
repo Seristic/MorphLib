@@ -4,6 +4,8 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import net.minecraft.world.entity.Entity;
 
+import com.seristic.logging.ModLogger;
+
 /**
  * Manages morph states for all entities.
  * Uses WeakHashMap to prevent memory leaks when entities are removed.
@@ -17,7 +19,7 @@ public class MorphManager {
      * platform-specific code.
      */
     public static void applyMorph(Entity entity, MorphData data) {
-        Morphlib.LOGGER.info("Applying morph to entity: {} with data: {}", entity.getStringUUID(), data);
+        ModLogger.info("MorphManager", "Applying morph to entity: " + entity.getStringUUID() + " with data: " + data);
         morphMap.put(entity, data);
     }
 
@@ -42,7 +44,7 @@ public class MorphManager {
     public static void removeMorph(Entity entity) {
         MorphData removed = morphMap.remove(entity);
         if (removed != null) {
-            Morphlib.LOGGER.info("Removed morph from entity: {}", entity.getStringUUID());
+            ModLogger.info("MorphManager", "Removed morph from entity: " + entity.getStringUUID());
         }
     }
 
@@ -51,7 +53,7 @@ public class MorphManager {
      */
     public static void clear() {
         morphMap.clear();
-        Morphlib.LOGGER.info("Cleared all morph data");
+        ModLogger.info("MorphManager", "Cleared all morph data");
     }
 
     /**
