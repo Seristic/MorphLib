@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "morphlib",
+  "version": "${version}",
+  "name": "MorphLib",
+  "description": "WRITE THIS AFTER",
+  "authors": [
+    "Seristic - Original Author"
+  ],
+  "contact": {
+    "homepage": "www.blog.seristic.com"
+  },
+  "license": "All-Rights-Reserved",
+  "icon": "assets/morphlib/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.seristic.morphlib.fabric.MorphlibFabric"
+    ],
+    "client": [
+      "com.seristic.morphlib.fabric.client.MorphlibFabricClient"
+    ]
+  },
+  "mixins": [
+    "morphlib.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.9",
+    "minecraft": "~1.21.4",
+    "java": ">=21",
+    "architectury": ">=15.0.1",
+    "fabric-api": "*"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}

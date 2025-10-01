@@ -1,0 +1,19 @@
+pluginManagement {
+    repositories {
+        maven { url "https://maven.fabricmc.net/" }
+        maven { url "https://maven.architectury.dev/" }
+        maven { url "https://files.minecraftforge.net/maven/" }
+        gradlePluginPortal()
+    }
+}
+
+rootProject.name = 'morphlib'
+
+include 'common'
+include 'fabric'
+include 'neoforge'
+include 'common', 'fabric', 'neoforge'
+
+project(':common').projectDir = file('common')
+project(':fabric').projectDir = file('fabric')
+project(':neoforge').projectDir = file('neoforge')
