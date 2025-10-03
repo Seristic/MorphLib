@@ -1,0 +1,66 @@
+---
+name: Feature Request
+description: Suggest a new feature or enhancement for MorphLib
+title: "[FEATURE] "
+labels: ["enhancement", "triage"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new feature! Please fill out the form below to help us understand your idea.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Feature Summary
+      description: A brief summary of the feature you'd like to see.
+      placeholder: "Add support for custom morph proportions"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem/Use Case
+      description: What problem would this feature solve? What's the use case?
+      placeholder: "Currently, morphs only support predefined entity proportions. Custom proportions would allow for more creative morphs and better integration with other mods."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe how you think this feature should work.
+      placeholder: |
+        Add API methods to MorphState for setting custom scale factors:
+        - setCustomScale(width, height)
+        - setCustomEyeHeight(eyeHeight)
+        - Support for per-axis scaling
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternative Solutions
+      description: Have you considered any alternative approaches?
+      placeholder: |
+        - Configuration files for custom morphs
+        - Data pack support for morph definitions
+        - Built-in presets for common proportions
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Add any other context, screenshots, or examples.
+      placeholder: |
+        - Links to similar features in other mods
+        - Mockups or diagrams
+        - Related issues or discussions
+    validations:
+      required: false

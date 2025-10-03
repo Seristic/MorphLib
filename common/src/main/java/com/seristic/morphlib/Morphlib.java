@@ -4,8 +4,8 @@ import java.time.ZoneId;
 import java.nio.file.Path;
 import java.time.format.DateTimeFormatter;
 
-import com.seristic.logging.ModLogger;
-import com.seristic.logging.LoggingConfig;
+import com.seristic.morphlib.logging.ModLogger;
+import com.seristic.morphlib.logging.LoggingConfig;
 
 public final class Morphlib {
     public static final String MOD_ID = "morphlib";

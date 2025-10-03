@@ -1,9 +1,12 @@
 package com.seristic.morphlib;
 
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
+
+import java.util.UUID;
 
 public class MorphData {
     public enum Gender {
@@ -16,12 +19,37 @@ public class MorphData {
         SLIM
     }
 
+    private UUID morphId;
+
     private Gender gender = Gender.MALE;
     private BodyType bodyType = BodyType.NORMAL;
     private ResourceLocation customSkin = null;
     private EntityType<?> entityType = EntityType.PLAYER;
 
     public MorphData() {
+        this.morphId = UUID.randomUUID();
+    }
+
+    public MorphData(UUID morphId) {
+        this.morphId = morphId;
+    }
+
+    public static MorphData create(EntityType<?> entityType, Gender gender, BodyType bodyType,
+            ResourceLocation customSkin) {
+        MorphData data = new MorphData();
+        data.setEntityType(entityType);
+        data.setGender(gender);
+        data.setBodyType(bodyType);
+        data.setCustomSkin(customSkin);
+        return data;
+    }
+
+    public UUID getMorphId() {
+        return morphId;
+    }
+
+    public void setMorphId(UUID morphId) {
+        this.morphId = morphId;
     }
 
     public Gender getGender() {
@@ -57,6 +85,8 @@ public class MorphData {
     }
 
     public void write(RegistryFriendlyByteBuf buf) {
+        buf.writeUUID(morphId);
+
         buf.writeEnum(gender);
         buf.writeEnum(bodyType);
         buf.writeBoolean(customSkin != null);
@@ -67,7 +97,9 @@ public class MorphData {
     }
 
     public static MorphData read(RegistryFriendlyByteBuf buf) {
-        MorphData data = new MorphData();
+        UUID morphId = buf.readUUID();
+
+        MorphData data = new MorphData(morphId);
         data.gender = buf.readEnum(Gender.class);
         data.bodyType = buf.readEnum(BodyType.class);
         if (buf.readBoolean()) {
@@ -75,6 +107,66 @@ public class MorphData {
         }
         ResourceLocation entityTypeId = buf.readResourceLocation();
         data.entityType = BuiltInRegistries.ENTITY_TYPE.getOptional(entityTypeId).orElse(EntityType.PLAYER);
+        return data;
+    }
+
+    /**
+     * Write the morph data to an NBT compound tag.
+     */
+    public CompoundTag writeNBT() {
+        CompoundTag tag = new CompoundTag();
+
+        tag.putUUID("morphId", morphId);
+        tag.putString("gender", gender.name());
+        tag.putString("bodyType", bodyType.name());
+        if (customSkin != null) {
+            tag.putString("customSkin", customSkin.toString());
+        }
+        tag.putString("entityType", BuiltInRegistries.ENTITY_TYPE.getKey(entityType).toString());
+        return tag;
+    }
+
+    /**
+     * Read morph data from an NBT compound tag.
+     */
+    public static MorphData readNBT(CompoundTag tag) {
+        UUID morphId = tag.contains("morphId") ? tag.getUUID("morphId") : UUID.randomUUID();
+        MorphData data = new MorphData(morphId);
+
+        if (tag.contains("gender")) {
+            try {
+                data.gender = Gender.valueOf(tag.getString("gender"));
+            } catch (IllegalArgumentException e) {
+                data.gender = Gender.MALE; // Default fallback
+            }
+        }
+
+        if (tag.contains("bodyType")) {
+            try {
+                data.bodyType = BodyType.valueOf(tag.getString("bodyType"));
+            } catch (IllegalArgumentException e) {
+                data.bodyType = BodyType.NORMAL; // Default fallback
+            }
+        }
+
+        if (tag.contains("customSkin")) {
+            try {
+                data.customSkin = ResourceLocation.parse(tag.getString("customSkin"));
+            } catch (Exception e) {
+                data.customSkin = null; // Invalid resource location
+            }
+        }
+
+        if (tag.contains("entityType")) {
+            ResourceLocation entityTypeId;
+            try {
+                entityTypeId = ResourceLocation.parse(tag.getString("entityType"));
+                data.entityType = BuiltInRegistries.ENTITY_TYPE.getOptional(entityTypeId).orElse(EntityType.PLAYER);
+            } catch (Exception e) {
+                data.entityType = EntityType.PLAYER; // Default fallback
+            }
+        }
+
         return data;
     }
 

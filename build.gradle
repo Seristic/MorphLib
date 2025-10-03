@@ -32,24 +32,11 @@ subprojects {
         maven {
             url "https://repo.spongepowered.org/repository/maven-public/"
         }
-
-        // GitHub Packages repository
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/Seristic/HomesteadCore")
-            credentials {
-                username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
-                password = project.findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN")
-            }
-        }
     }
 
     dependencies {
         minecraft "net.minecraft:minecraft:$rootProject.minecraft_version"
         mappings loom.officialMojangMappings()
-
-        // Common dependencies
-        implementation "com.seristic:homesteadcore:1.0.0"
     }
 
     java {
