@@ -1,5 +1,6 @@
 package com.seristic.morphlib;
 
+import com.seristic.morphlib.morph.MorphState;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -25,6 +26,7 @@ public class MorphData {
     private BodyType bodyType = BodyType.NORMAL;
     private ResourceLocation customSkin = null;
     private EntityType<?> entityType = EntityType.PLAYER;
+    private MorphState morphState = new MorphState();
 
     public MorphData() {
         this.morphId = UUID.randomUUID();
@@ -41,6 +43,17 @@ public class MorphData {
         data.setGender(gender);
         data.setBodyType(bodyType);
         data.setCustomSkin(customSkin);
+        return data;
+    }
+
+    public static MorphData create(EntityType<?> entityType, Gender gender, BodyType bodyType,
+            ResourceLocation customSkin, MorphState morphState) {
+        MorphData data = new MorphData();
+        data.setEntityType(entityType);
+        data.setGender(gender);
+        data.setBodyType(bodyType);
+        data.setCustomSkin(customSkin);
+        data.setMorphState(morphState);
         return data;
     }
 
@@ -84,6 +97,14 @@ public class MorphData {
         this.entityType = entityType;
     }
 
+    public MorphState getMorphState() {
+        return morphState;
+    }
+
+    public void setMorphState(MorphState morphState) {
+        this.morphState = morphState != null ? morphState : new MorphState();
+    }
+
     public void write(RegistryFriendlyByteBuf buf) {
         buf.writeUUID(morphId);
 
@@ -94,6 +115,7 @@ public class MorphData {
             buf.writeResourceLocation(customSkin);
         }
         buf.writeResourceLocation(BuiltInRegistries.ENTITY_TYPE.getKey(entityType));
+        morphState.write(buf);
     }
 
     public static MorphData read(RegistryFriendlyByteBuf buf) {
@@ -107,6 +129,7 @@ public class MorphData {
         }
         ResourceLocation entityTypeId = buf.readResourceLocation();
         data.entityType = BuiltInRegistries.ENTITY_TYPE.getOptional(entityTypeId).orElse(EntityType.PLAYER);
+        data.morphState = MorphState.read(buf);
         return data;
     }
 
@@ -123,6 +146,10 @@ public class MorphData {
             tag.putString("customSkin", customSkin.toString());
         }
         tag.putString("entityType", BuiltInRegistries.ENTITY_TYPE.getKey(entityType).toString());
+
+        // Write morph state
+        tag.put("morphState", morphState.writeNBT());
+
         return tag;
     }
 
@@ -167,12 +194,17 @@ public class MorphData {
             }
         }
 
+        // Read morph state
+        if (tag.contains("morphState")) {
+            data.morphState = MorphState.readNBT(tag.getCompound("morphState"));
+        }
+
         return data;
     }
 
     @Override
     public String toString() {
         return "MorphData{gender=" + gender + ", bodyType=" + bodyType + ", customSkin=" + customSkin + ", entityType="
-                + entityType + "}";
+                + entityType + ", morphState=" + morphState + "}";
     }
 }

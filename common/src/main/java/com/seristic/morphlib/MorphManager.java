@@ -72,6 +72,69 @@ public class MorphManager {
         }
         ModLogger.info("MorphManager", "Applying morph to entity: " + entity.getStringUUID() + " with data: " + data);
         accessor.setMorph(entity, data);
+
+        // Apply actual scaling transformations to the entity
+        applyEntityScaling(entity, data);
+    }
+
+    /**
+     * Apply scaling transformations to an entity based on morph data.
+     * This modifies the entity's actual dimensions and bounding box.
+     */
+    private static void applyEntityScaling(Entity entity, MorphData data) {
+        if (!(entity instanceof net.minecraft.world.entity.LivingEntity livingEntity)) {
+            return; // Only apply scaling to living entities
+        }
+
+        // Get the morph state from the data
+        var morphState = data.getMorphState();
+        if (morphState == null) {
+            return;
+        }
+
+        // Calculate overall scale based on height (primary scaling factor)
+        float scale = morphState.getHeight();
+
+        // Apply scale to the living entity using reflection (Minecraft 1.21+ has scale
+        // field)
+        try {
+            java.lang.reflect.Field scaleField = net.minecraft.world.entity.LivingEntity.class
+                    .getDeclaredField("scale");
+            scaleField.setAccessible(true);
+            scaleField.setFloat(livingEntity, scale);
+
+            // Update entity's bounding box to match new scale
+            livingEntity.refreshDimensions();
+
+            ModLogger.debug("MorphManager", "Applied scaling to entity " + entity.getStringUUID() +
+                    ": scale=" + scale + ", height=" + morphState.getHeight());
+        } catch (Exception e) {
+            ModLogger.warn("MorphManager", "Failed to apply entity scaling: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Reset entity scaling to default (scale = 1.0).
+     */
+    private static void resetEntityScaling(Entity entity) {
+        if (!(entity instanceof net.minecraft.world.entity.LivingEntity livingEntity)) {
+            return; // Only apply to living entities
+        }
+
+        // Reset scale to default (1.0)
+        try {
+            java.lang.reflect.Field scaleField = net.minecraft.world.entity.LivingEntity.class
+                    .getDeclaredField("scale");
+            scaleField.setAccessible(true);
+            scaleField.setFloat(livingEntity, 1.0f);
+
+            // Update entity's bounding box
+            livingEntity.refreshDimensions();
+
+            ModLogger.debug("MorphManager", "Reset scaling for entity " + entity.getStringUUID());
+        } catch (Exception e) {
+            ModLogger.warn("MorphManager", "Failed to reset entity scaling: " + e.getMessage());
+        }
     }
 
     /**
@@ -112,6 +175,9 @@ public class MorphManager {
         if (removed != null) {
             ModLogger.info("MorphManager", "Removed morph from entity: " + entity.getStringUUID());
             accessor.removeMorph(entity);
+
+            // Reset entity scaling to default
+            resetEntityScaling(entity);
         }
     }
 
@@ -215,6 +281,7 @@ public class MorphManager {
     public static void clearAllMorphs(Entity entity) {
         removeMorph(entity);
         removeMorphStack(entity);
+        // Scaling is already reset in removeMorph()
         ModLogger.info("MorphManager", "Cleared all morphs from entity: " + entity.getStringUUID());
     }
 }

@@ -157,31 +157,24 @@ public final class MorphRenderHandler {
                 "🎯 MORPH DETECTED for " + morphData.getEntityType().toShortString() +
                         " to player: " + player.getName().getString());
 
-        // Initialize morph state in cache if not present
-        MorphState morphState = MorphCache.getInstance().getInterpolatedState(
-                player.getUUID(), 0.0f);
-
-        ModLogger.debug("MorphRenderHandler", "Retrieved morph state: height=" + morphState.getHeight() +
-                ", bodyWidth=" + morphState.getBodyWidth());
-
-        // If no morph state exists, generate one based on entity type
-        if (morphState.getContentHash() == new MorphState().getContentHash()) {
-            // Generate appropriate morph state based on entity type
-            MorphState newState = generateMorphStateFromEntityType(morphData.getEntityType());
-            ModLogger.debug("MorphRenderHandler", "Generated new state: height=" + newState.getHeight() +
-                    ", bodyWidth=" + newState.getBodyWidth());
-
-            MorphCache.getInstance().updateMorphState(player.getUUID(), newState);
-
-            ModLogger.debug("MorphRenderHandler",
-                    "Generated new morph state for " + morphData.getEntityType().toShortString());
-
-            // Use the newly generated state
-            morphState = newState;
+        // Get morph state from the morph data directly
+        MorphState morphState = morphData.getMorphState();
+        if (morphState == null) {
+            morphState = new MorphState(); // Fallback to default
         }
 
+        // Update cache with the morph state for interpolation
+        MorphCache.getInstance().updateMorphState(player.getUUID(), morphState);
+
+        // Get interpolated state for smooth transitions
+        MorphState interpolatedState = MorphCache.getInstance().getInterpolatedState(
+                player.getUUID(), 0.0f);
+
+        ModLogger.debug("MorphRenderHandler", "Using morph state: height=" + interpolatedState.getHeight() +
+                ", bodyWidth=" + interpolatedState.getBodyWidth());
+
         // Apply morph transforms to the render state
-        applyMorphToRenderState(renderState, morphState, morphData);
+        applyMorphToRenderState(renderState, interpolatedState, morphData);
 
         // DON'T cancel the event - this was causing invisible players
         // event.setCanceled(true); // <-- This was the problem!
