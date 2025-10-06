@@ -2,7 +2,7 @@ package com.seristic.morphlib.neoforge;
 
 import com.seristic.morphlib.Morphlib;
 import com.seristic.morphlib.MorphManager;
-import com.seristic.morphlib.neoforge.client.MorphRenderHandler;
+import com.seristic.morphlib.client.render.UniversalMorphRenderHandler;
 import com.seristic.morphlib.neoforge.command.MorphCommand;
 import com.seristic.morphlib.logging.ModLogger;
 import net.neoforged.bus.api.IEventBus;
@@ -44,9 +44,9 @@ public class MorphlibNeoForge {
     }
 
     private void clientSetup(FMLClientSetupEvent event) {
-        // Register morph rendering handler
-        MorphRenderHandler.register();
-        ModLogger.info("MorphlibNeoForge", "Client setup completed");
+        // Register universal morph rendering handler (works on ALL LivingEntity types)
+        UniversalMorphRenderHandler.register();
+        ModLogger.info("MorphlibNeoForge", "✅ Universal morph render handler registered");
     }
 
     private void registerNetworking(RegisterPayloadHandlersEvent event) {
